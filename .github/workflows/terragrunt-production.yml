@@ -1,0 +1,31 @@
+name: Run terragrunt against production
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+env:
+  tf_version: "1.5.7"
+  tg_version: "0.53.2"
+  working_dir: "live/production"
+  ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
+  ARM_CLIENT_CERTIFICATE: ${{secrets.ARM_CLIENT_CERTIFICATE}}
+  ARM_CLIENT_CERTIFICATE_PASSWORD: ${{secrets.ARM_CLIENT_CERTIFICATE_PASSWORD}}
+  ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
+  ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
+
+jobs:
+  run-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Check
+        uses: ./.github/workflows/composite/terragrunt-check
+
+      - name: Plan
+        uses: ./.github/workflows/composite/terragrunt-plan
+
+      - name: Apply
+        uses: ./.github/workflows/composite/terragrunt-apply

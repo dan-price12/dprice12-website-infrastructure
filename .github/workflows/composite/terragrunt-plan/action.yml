@@ -1,0 +1,13 @@
+name: Terragrunt Plan
+description: "Runs Terragrunt plan on specified environment"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Plan
+      uses: gruntwork-io/terragrunt-action@v2
+      with:
+        tf_version: ${{ env.tf_version }}
+        tg_version: ${{ env.tg_version }}
+        tg_dir: ${{ env.working_dir }}
+        tg_command: "plan"
