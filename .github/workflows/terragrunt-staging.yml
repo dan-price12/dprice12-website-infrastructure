@@ -3,6 +3,11 @@ on:
   workflow_dispatch:
   push:
     branches: [develop]
+    paths:
+      - live/staging/**
+      - modules/**
+      - .github/workflows/composite/**
+      - .github/workflows/terragrunt-staging.yml
 
 env:
   tf_version: "1.5.7"
