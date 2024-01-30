@@ -9,17 +9,34 @@ env:
   tg_version: "0.53.2"
   working_dir: "live/production"
   ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
-  ARM_CLIENT_CERTIFICATE: ${{secrets.ARM_CLIENT_CERTIFICATE}}
-  ARM_CLIENT_CERTIFICATE_PASSWORD: ${{secrets.ARM_CLIENT_CERTIFICATE_PASSWORD}}
+  ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
   ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
   ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
+  AZURE_CORE_OUTPUT: "none"
 
 jobs:
   run-ci:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZ_CREDS }}
+
+      - name: Whitelist GitHub Runner IP
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            set -eu
+            apk add --no-cache curl
+            agentIP=$(curl -s https://api.ipify.org/)
+            az keyvault network-rule add \
+              --name "${{ secrets.PRODUCTION_KEYVAULT_NAME }}" \
+              --resource-group "${{ secrets.PRODUCTION_KEYVAULT_RESOURCE_GROUP }}" \
+              --ip-address $agentIP
+            sleep 30
 
       - name: Check
         uses: ./.github/workflows/composite/terragrunt-check
@@ -29,3 +46,21 @@ jobs:
 
       - name: Apply
         uses: ./.github/workflows/composite/terragrunt-apply
+
+      - name: Remove GitHub Runner IP from Whitelist
+        if: always()
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            set -eu
+            apk add --no-cache curl
+            agentIP=$(curl -s https://api.ipify.org/)
+            az keyvault network-rule remove  \
+            --name "${{ secrets.PRODUCTION_KEYVAULT_NAME }}" \
+            --resource-group "${{ secrets.PRODUCTION_KEYVAULT_RESOURCE_GROUP }}" \
+              --ip-address $agentIP
+
+      - name: logout
+        if: always()
+        run: |
+          az logout
