@@ -1,5 +1,9 @@
 data "azurerm_client_config" "current" {}
 
+data "http" "ip_address" {
+  url = "https://api.ipify.org/"
+}
+
 resource "azurerm_resource_group" "core_rg" {
   name     = var.core_rg_name
   location = var.location
@@ -36,6 +40,9 @@ resource "azurerm_key_vault" "core_kv" {
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
+    ip_rules = [
+      "${chomp(data.http.ip_address.response_body)}/32",
+    ]
   }
 }
 

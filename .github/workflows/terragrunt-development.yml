@@ -1,13 +1,11 @@
-name: Run terragrunt against staging
+name: Run terragrunt against development
 on:
   workflow_dispatch:
-  push:
-    branches: [develop]
 
 env:
   tf_version: "1.5.7"
   tg_version: "0.53.2"
-  working_dir: "live/staging"
+  working_dir: "live/development"
   ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
   ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
   ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
@@ -33,8 +31,8 @@ jobs:
             apk add --no-cache curl
             agentIP=$(curl -s https://api.ipify.org/)
             az keyvault network-rule add \
-              --name "${{ secrets.STAGING_KEYVAULT_NAME }}" \
-              --resource-group "${{ secrets.STAGING_KEYVAULT_RESOURCE_GROUP }}" \
+              --name "${{ secrets.DEVELOPMENT_KEYVAULT_NAME }}" \
+              --resource-group "${{ secrets.DEVELOPMENT_KEYVAULT_RESOURCE_GROUP }}" \
               --ip-address $agentIP
             sleep 30
 
@@ -56,8 +54,8 @@ jobs:
             apk add --no-cache curl
             agentIP=$(curl -s https://api.ipify.org/)
             az keyvault network-rule remove  \
-            --name "${{ secrets.STAGING_KEYVAULT_NAME }}" \
-            --resource-group "${{ secrets.STAGING_KEYVAULT_RESOURCE_GROUP }}" \
+            --name "${{ secrets.DEVELOPMENT_KEYVAULT_NAME }}" \
+            --resource-group "${{ secrets.DEVELOPMENT_KEYVAULT_RESOURCE_GROUP }}" \
               --ip-address $agentIP
 
       - name: logout
