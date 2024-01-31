@@ -20,6 +20,11 @@ data "azurerm_key_vault_secret" "website_source_email_id" {
   key_vault_id = data.azurerm_key_vault.core_kv_data.id
 }
 
+data "azurerm_key_vault_secret" "website_destination_email" {
+  name         = "WebsiteDestinationEmail"
+  key_vault_id = data.azurerm_key_vault.core_kv_data.id
+}
+
 resource "azurerm_resource_group" "website_rg" {
   name     = var.website_rg_name
   location = var.location
@@ -37,7 +42,7 @@ resource "azurerm_static_site" "static_app" {
   app_settings = {
     "CLIENT_ID"         = data.azurerm_key_vault_secret.website_client_id.value
     "CLIENT_SECRET"     = data.azurerm_key_vault_secret.website_client_secret.value
-    "DESTINATION_EMAIL" = var.destination_email
+    "DESTINATION_EMAIL" = data.azurerm_key_vault_secret.website_destination_email.value
     "SOURCE_EMAIL_ID"   = data.azurerm_key_vault_secret.website_source_email_id.value
     "TENANT_ID"         = data.azurerm_client_config.current.tenant_id
   }

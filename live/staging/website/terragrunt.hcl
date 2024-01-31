@@ -11,9 +11,8 @@ terraform {
 }
 
 inputs = {
-  static_app_name   = "stapp-website-staging-useast2-001"
-  destination_email = "info@salienttechconsulting.com"
-  website_rg_name   = "rg-website-staging-001"
-  core_kv_name      = dependency.core-services.outputs.core_kv.name
-  core_kv_rg_name   = dependency.core-services.outputs.core_rg.name
+  static_app_name = "stapp-website-staging-useast2-001"
+  website_rg_name = "rg-website-staging-001"
+  core_kv_name    = dependency.core-services.outputs.core_kv.name
+  core_kv_rg_name = dependency.core-services.outputs.core_rg.name
 }
