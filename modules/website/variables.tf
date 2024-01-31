@@ -18,11 +18,6 @@ variable "static_app_name" {
   description = "The name of the static web app"
 }
 
-variable "destination_email" {
-  type        = string
-  description = "The destination email address for the contact form"
-}
-
 variable "core_kv_name" {
   type        = string
   description = "The name of the Key Vault to use for the configuration settings"
